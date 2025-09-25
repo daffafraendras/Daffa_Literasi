@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generate Excel File</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        
+        h1 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+        
+        .info {
+            background: #e7f3ff;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+            border-left: 4px solid #2196F3;
+        }
+        
+        .download-btn {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 20px 10px;
+        }
+        
+        .download-btn:hover {
+            background: #45a049;
+        }
+        
+        .status {
+            margin-top: 20px;
+            padding: 10px;
+            border-radius: 5px;
+            display: none;
+        }
+        
+        .success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .summary {
+            text-align: left;
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📊 Excel File Generator</h1>
+        <p><strong>Data Daffa Farendra (V3925041)</strong></p>
+        
+        <div class="info">
+            <p>File Excel akan dibuat dengan 4 worksheet:</p>
+            <ul style="text-align: left; display: inline-block;">
+                <li><strong>Data_APBN</strong> - 25 records (2001-2025)</li>
+                <li><strong>Pendapatan_Negara</strong> - 25 records</li>
+                <li><strong>Laporan_Keuangan</strong> - 25 records (2001-2025)</li>
+                <li><strong>LHKPN_KPK</strong> - 26 records</li>
+            </ul>
+        </div>
+        
+        <button class="download-btn" onclick="generateExcelFile()">
+            📥 Generate & Download Excel File
+        </button>
+        
+        <div id="status" class="status"></div>
+        
+        <div class="summary">
+            <h3>📋 Data Summary:</h3>
+            <p><strong>Total Records:</strong> 101</p>
+            <p><strong>File Name:</strong> Daffa_Farendra_V3925041_Data.xlsx</p>
+            <p><strong>Format:</strong> Microsoft Excel (.xlsx)</p>
+            <p><strong>Worksheets:</strong> 4 sheets dengan data terpisah</p>
+        </div>
+    </div>
+
+    <script>
+        // Data JSON dari file Anda
+        const jsonData = {
+            "Data_APBN": [
+                {"tahun": 2025, "pendapatan": 2500, "belanja": 2700, "defisit": 200, "sumber_pendapatan": "pajak"},
+                {"tahun": 2024, "pendapatan": 2400, "belanja": 2600, "defisit": 200, "sumber_pendapatan": "pajak"},
+                {"tahun": 2023, "pendapatan": 2300, "belanja": 2500, "defisit": 200, "sumber_pendapatan": "pajak"},
+                {"tahun": 2022, "pendapatan": 2200, "belanja": 2400, "defisit": 200, "sumber_pendapatan": "pajak"},
+                {"tahun": 2021, "pendapatan": 2100, "belanja": 2300, "defisit": 200, "sumber_pendapatan": "pajak"},
+                {"tahun": 2020, "pendapatan": 2000, "belanja": 2200, "defisit": 200, "sumber_pendapatan": "pajak"},
+                {"tahun": 2019, "pendapatan": 1900, "belanja": 2100, "defisit": 200, "sumber_pendapatan": "pajak"},
+                {"tahun": 2018, "pendapatan": 1800, "belanja": 2000, "defisit": 200, "sumber_pendapatan": "pajak"},
+                {"tahun": 2017, "pendapatan": 1700, "belanja": 1900, "defisit": 200, "sumber_pendapatan": "pajak"},
+                {"tahun": 2016, "pendapatan": 1600, "belanja": 1800, "defisit": 200, "sumber_pendapatan": "pajak"},
+                {"tahun": 2015, "pendapatan": 1500, "belanja": 1700, "defisit": 200, "sumber_pendapatan": "pajak"},
+                {"tahun": 2014, "pendapatan": 1400, "belanja": 1600, "defisit": 200, "sumber_pendapatan": "pajak"},
+                {"tahun": 2013, "pendapatan": 1300, "belanja": 1500, "defisit": 200, "sumber_pendapatan": "pajak"},
+                {"tahun": 2012, "pendapatan": 1200, "belanja": 1400, "defisit": 200, "sumber_pendapatan": "pajak"},
+                {"tahun": 2011, "pendapatan": 1100, "belanja": 1300, "defisit": 200, "sumber_pendapatan": "pajak"},
+                {"tahun": 2010, "pendapatan": 1000, "belanja": 1200, "defisit": 200, "sumber_pendapatan": "pajak"},
+                {"tahun": 2009, "pendapatan": 900, "belanja": 1100, "defisit": 200, "sumber_pendapatan": "pajak"},
+                {"tahun": 2008, "pendapatan": 800, "belanja": 1000, "defisit": 200, "sumber_pendapatan": "pajak"},
+                {"tahun": 2007, "pendapatan": 700, "belanja": 900, "defisit": 200, "sumber_pendapatan": "pajak"},
+                {"tahun": 2006, "pendapatan": 600, "belanja": 800, "defisit": 200, "sumber_pendapatan": "pajak"},
+                {"tahun": 2005, "pendapatan": 500, "belanja": 700, "defisit": 200, "sumber_pendapatan": "pajak"},
+                {"tahun": 2004, "pendapatan": 400, "belanja": 600, "defisit": 200, "sumber_pendapatan": "pajak"},
+                {"tahun": 2003, "pendapatan": 300, "belanja": 500, "defisit": 200, "sumber_pendapatan": "pajak"},
+                {"tahun": 2002, "pendapatan": 200, "belanja": 400, "defisit": 200, "sumber_pendapatan": "pajak"},
+                {"tahun": 2001, "pendapatan": 100, "belanja": 300, "defisit": 200, "sumber_pendapatan": "pajak"}
+            ],
+
+            "Data_Pendapatan_Negara": [
+                {"tahun": 2025, "jenis_pendapatan": "pajak", "jumlah": 1800},
+                {"tahun": 2025, "jenis_pendapatan": "non_pajak", "jumlah": 700},
+                {"tahun": 2024, "jenis_pendapatan": "pajak", "jumlah": 1700},
+                {"tahun": 2024, "jenis_pendapatan": "non_pajak", "jumlah": 700},
+                {"tahun": 2023, "jenis_pendapatan": "pajak", "jumlah": 1600},
+                {"tahun": 2023, "jenis_pendapatan": "non_pajak", "jumlah": 700},
+                {"tahun": 2022, "jenis_pendapatan": "pajak", "jumlah": 1500},
+                {"tahun": 2022, "jenis_pendapatan": "non_pajak", "jumlah": 700},
+                {"tahun": 2021, "jenis_pendapatan": "pajak", "jumlah": 1400},
+                {"tahun": 2021, "jenis_pendapatan": "non_pajak", "jumlah": 700},
+                {"tahun": 2020, "jenis_pendapatan": "pajak", "jumlah": 1300},
+                {"tahun": 2020, "jenis_pendapatan": "non_pajak", "jumlah": 700},
+                {"tahun": 2019, "jenis_pendapatan": "pajak", "jumlah": 1200},
+                {"tahun": 2019, "jenis_pendapatan": "non_pajak", "jumlah": 700},
+                {"tahun": 2018, "jenis_pendapatan": "pajak", "jumlah": 1100},
+                {"tahun": 2018, "jenis_pendapatan": "non_pajak", "jumlah": 700},
+                {"tahun": 2017, "jenis_pendapatan": "pajak", "jumlah": 1000},
+                {"tahun": 2017, "jenis_pendapatan": "non_pajak", "jumlah": 700},
+                {"tahun": 2016, "jenis_pendapatan": "pajak", "jumlah": 900},
+                {"tahun": 2016, "jenis_pendapatan": "non_pajak", "jumlah": 700},
+                {"tahun": 2015, "jenis_pendapatan": "pajak", "jumlah": 800},
+                {"tahun": 2015, "jenis_pendapatan": "non_pajak", "jumlah": 700},
+                {"tahun": 2014, "jenis_pendapatan": "pajak", "jumlah": 700},
+                {"tahun": 2014, "jenis_pendapatan": "non_pajak", "jumlah": 700},
+                {"tahun": 2013, "jenis_pendapatan": "pajak", "jumlah": 600}
+            ],
+
+            "Data_Laporan_Keuangan_Pemerintah": [
+                {"tahun": 2025, "aset": 5000, "liabilitas": 2000, "ekuitas": 3000},
+                {"tahun": 2024, "aset": 4800, "liabilitas": 1900, "ekuitas": 2900},
+                {"tahun": 2023, "aset": 4600, "liabilitas": 1800, "ekuitas": 2800},
+                {"tahun": 2022, "aset": 4400, "liabilitas": 1700, "ekuitas": 2700},
+                {"tahun": 2021, "aset": 4200, "liabilitas": 1600, "ekuitas": 2600},
+                {"tahun": 2020, "aset": 4000, "liabilitas": 1500, "ekuitas": 2500},
+                {"tahun": 2019, "aset": 3800, "liabilitas": 1400, "ekuitas": 2400},
+                {"tahun": 2018, "aset": 3600, "liabilitas": 1300, "ekuitas": 2300},
+                {"tahun": 2017, "aset": 3400, "liabilitas": 1200, "ekuitas": 2200},
+                {"tahun": 2016, "aset": 3200, "liabilitas": 1100, "ekuitas": 2100},
+                {"tahun": 2015, "aset": 3000, "liabilitas": 1000, "ekuitas": 2000},
+                {"tahun": 2014, "aset": 2800, "liabilitas": 900, "ekuitas": 1900},
+                {"tahun": 2013, "aset": 2600, "liabilitas": 800, "ekuitas": 1800},
+                {"tahun": 2012, "aset": 2400, "liabilitas": 700, "ekuitas": 1700},
+                {"tahun": 2011, "aset": 2200, "liabilitas": 600, "ekuitas": 1600},
+                {"tahun": 2010, "aset": 2000, "liabilitas": 500, "ekuitas": 1500},
+                {"tahun": 2009, "aset": 1800, "liabilitas": 400, "ekuitas": 1400},
+                {"tahun": 2008, "aset": 1600, "liabilitas": 300, "ekuitas": 1300},
+                {"tahun": 2007, "aset": 1400, "liabilitas": 200, "ekuitas": 1200},
+                {"tahun": 2006, "aset": 1200, "liabilitas": 100, "ekuitas": 1100},
+                {"tahun": 2005, "aset": 1000, "liabilitas": 50, "ekuitas": 950},
+                {"tahun": 2004, "aset": 800, "liabilitas": 40, "ekuitas": 760},
+                {"tahun": 2003, "aset": 600, "liabilitas": 30, "ekuitas": 570},
+                {"tahun": 2002, "aset": 400, "liabilitas": 20, "ekuitas": 380},
+                {"tahun": 2001, "aset": 200, "liabilitas": 10, "ekuitas": 190}
+            ],
+
+            "Data_LHKPN_KPK": [
+                {"nama": "Andi", "lembaga": "DPR", "jabatan": "Anggota DPR", "tanggal_lapor": "2025-01-15", "jenis_laporan": "Tahunan", "total_harta": 1500000000},
+                {"nama": "Budi", "lembaga": "Kementerian Keuangan", "jabatan": "Menteri", "tanggal_lapor": "2025-02-10", "jenis_laporan": "Tahunan", "total_harta": 2500000000},
+                {"nama": "Citra", "lembaga": "Mahkamah Agung", "jabatan": "Hakim", "tanggal_lapor": "2025-03-05", "jenis_laporan": "Tahunan", "total_harta": 1200000000},
+                {"nama": "Dewi", "lembaga": "Kementerian Pendidikan", "jabatan": "Dirjen", "tanggal_lapor": "2025-04-12", "jenis_laporan": "Tahunan", "total_harta": 900000000},
+                {"nama": "Eko", "lembaga": "Kementerian Pertanian", "jabatan": "Sekretaris", "tanggal_lapor": "2025-05-20", "jenis_laporan": "Tahunan", "total_harta": 1100000000},
+                {"nama": "Fajar", "lembaga": "BPK", "jabatan": "Anggota", "tanggal_lapor": "2025-06-18", "jenis_laporan": "Tahunan", "total_harta": 1300000000},
+                {"nama": "Gita", "lembaga": "Kementerian Kesehatan", "jabatan": "Direktur", "tanggal_lapor": "2025-07-22", "jenis_laporan": "Tahunan", "total_harta": 800000000},
+                {"nama": "Hadi", "lembaga": "Kementerian Perhubungan", "jabatan": "Staf Ahli", "tanggal_lapor": "2025-08-30", "jenis_laporan": "Tahunan", "total_harta": 950000000},
+                {"nama": "Intan", "lembaga": "Kementerian Sosial", "jabatan": "Kepala Biro", "tanggal_lapor": "2025-09-10", "jenis_laporan": "Tahunan", "total_harta": 700000000},
+                {"nama": "Joko", "lembaga": "Kementerian Energi", "jabatan": "Direktur", "tanggal_lapor": "2025-10-05", "jenis_laporan": "Tahunan", "total_harta": 1400000000},
+                {"nama": "Kiki", "lembaga": "Kementerian Lingkungan Hidup", "jabatan": "Kepala Divisi", "tanggal_lapor": "2025-11-15", "jenis_laporan": "Tahunan", "total_harta": 600000000},
+                {"nama": "Lina", "lembaga": "Kementerian Kominfo", "jabatan": "Direktur", "tanggal_lapor": "2025-12-01", "jenis_laporan": "Tahunan", "total_harta": 1000000000},
+                {"nama": "Mira", "lembaga": "Kementerian Perdagangan", "jabatan": "Sekretaris", "tanggal_lapor": "2025-01-25", "jenis_laporan": "Tahunan", "total_harta": 850000000},
+                {"nama": "Niko", "lembaga": "Kementerian Perindustrian", "jabatan": "Kepala Bagian", "tanggal_lapor": "2025-02-14", "jenis_laporan": "Tahunan", "total_harta": 750000000},
+                {"nama": "Oki", "lembaga": "Kementerian PU", "jabatan": "Direktur", "tanggal_lapor": "2025-03-19", "jenis_laporan": "Tahunan", "total_harta": 1250000000},
+                {"nama": "Putri", "lembaga": "Kementerian Koperasi", "jabatan": "Kepala Seksi", "tanggal_lapor": "2025-04-23", "jenis_laporan": "Tahunan", "total_harta": 650000000},
+                {"nama": "Qori", "lembaga": "Kementerian Agama", "jabatan": "Staf Ahli", "tanggal_lapor": "2025-05-28", "jenis_laporan": "Tahunan", "total_harta": 720000000},
+                {"nama": "Rina", "lembaga": "Kementerian Pariwisata", "jabatan": "Direktur", "tanggal_lapor": "2025-06-30", "jenis_laporan": "Tahunan", "total_harta": 980000000},
+                {"nama": "Sari", "lembaga": "Kementerian Ketenagakerjaan", "jabatan": "Kepala Biro", "tanggal_lapor": "2025-07-15", "jenis_laporan": "Tahunan", "total_harta": 870000000},
+                {"nama": "Tono", "lembaga": "Kementerian Luar Negeri", "jabatan": "Duta Besar", "tanggal_lapor": "2025-08-20", "jenis_laporan": "Tahunan", "total_harta": 2000000000},
+                {"nama": "Umi", "lembaga": "Kementerian Dalam Negeri", "jabatan": "Sekretaris", "tanggal_lapor": "2025-09-25", "jenis_laporan": "Tahunan", "total_harta": 1150000000},
+                {"nama": "Vina", "lembaga": "Kementerian Riset", "jabatan": "Direktur", "tanggal_lapor": "2025-10-30", "jenis_laporan": "Tahunan", "total_harta": 780000000},
+                {"nama": "Wawan", "lembaga": "Kementerian Pertahanan", "jabatan": "Jenderal", "tanggal_lapor": "2025-11-10", "jenis_laporan": "Tahunan", "total_harta": 3000000000},
+                {"nama": "Xena", "lembaga": "Kementerian Kesehatan", "jabatan": "Direktur", "tanggal_lapor": "2025-12-15", "jenis_laporan": "Tahunan", "total_harta": 900000000},
+                {"nama": "Yusuf", "lembaga": "Kementerian Pendidikan", "jabatan": "Menteri", "tanggal_lapor": "2025-01-05", "jenis_laporan": "Tahunan", "total_harta": 2800000000},
+                {"nama": "Zahra", "lembaga": "Kementerian Keuangan", "jabatan": "Wakil Menteri", "tanggal_lapor": "2025-02-12", "jenis_laporan": "Tahunan", "total_harta": 2600000000}
+            ]
+        };
+
+        function generateExcelFile() {
+            try {
+                // Create new workbook
+                const workbook = XLSX.utils.book_new();
+                
+                // Define worksheets
+                const worksheets = [
+                    {
+                        name: 'Data_APBN',
+                        data: jsonData.Data_APBN,
+                        description: 'Data APBN Indonesia 2001-2025'
+                    },
+                    {
+                        name: 'Pendapatan_Negara',
+                        data: jsonData.Data_Pendapatan_Negara,
+                        description: 'Data Pendapatan Negara'
+                    },
+                    {
+                        name: 'Laporan_Keuangan',
+                        data: jsonData.Data_Laporan_Keuangan_Pemerintah,
+                        description: 'Laporan Keuangan Pemerintah'
+                    },
+                    {
+                        name: 'LHKPN_KPK',
+                        data: jsonData.Data_LHKPN_KPK,
+                        description: 'Data LHKPN KPK'
+                    }
+                ];
+
+                // Create each worksheet
+                worksheets.forEach(ws => {
+                    const worksheet = XLSX.utils.json_to_sheet(ws.data);
+                    XLSX.utils.book_append_sheet(workbook, worksheet, ws.name);
+                    console.log(`✓ Created worksheet: ${ws.name} with ${ws.data.length} rows`);
+                });
+
+                // Generate filename with timestamp
+                const now = new Date();
+                const timestamp = now.toISOString().slice(0,10).replace(/-/g,'');
+                const filename = `Daffa_Farendra_V3925041_Data_${timestamp}.xlsx`;
+
+                // Write and download the Excel file
+                XLSX.writeFile(workbook, filename);
+
+                // Show success message
+                const statusDiv = document.getElementById('status');
+                statusDiv.className = 'status success';
+                statusDiv.style.display = 'block';
+                statusDiv.innerHTML = `
+                    <strong>✅ Success!</strong><br>
+                    File Excel berhasil dibuat: <strong>${filename}</strong><br>
+                    File telah didownload ke folder Downloads Anda.
+                `;
+
+                console.log(`🎉 Excel file created: ${filename}`);
+                console.log('📊 Summary:');
+                worksheets.forEach(ws => {
+                    console.log(`   - ${ws.name}: ${ws.data.length} records`);
+                });
+
+            } catch (error) {
+                console.error('❌ Error creating Excel file:', error);
+                const statusDiv = document.getElementById('status');
+                statusDiv.className = 'status error';
+                statusDiv.style.display = 'block';
+                statusDiv.innerHTML = `
+                    <strong>❌ Error!</strong><br>
+                    Gagal membuat file Excel: ${error.message}
+                `;
+            }
+        }
+
+        // Auto-generate file when page loads (optional)
+        // generateExcelFile();
+    </script>
+</body>
+</html>
